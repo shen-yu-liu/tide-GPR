@@ -1,0 +1,40 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+*.egg-info
+
+# Virtual environments
+.venv/
+.uv-cache/
+
+# Build artifacts
+build/
+dist/
+wheels/
+
+# Compiled shared libraries (keep libtide_C.so tracked via git add -f)
+*.so
+*.dylib
+*.dll
+
+# CMake build artifacts
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+CMakeFiles/
+compile_commands.json
+
+# Temporary/generated outputs
+outputs/
+benchmark_history/
+
+# Development notes (optional - remove if you want to track these)
+benchmarks.md
+check.md
+
+# Generated images/media (examples output)
+*.gif
+*.jpg
+*.png
+*.html
+!README.md

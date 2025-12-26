@@ -1,0 +1,74 @@
+[project]
+name = "tide"
+version = "0.1.0"
+description = "Torch-based Inversion & Development Engine for electromagnetic wave propagation"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.12"
+authors = [
+    {name = "Pu Yang", email = "your.email@example.com"}
+]
+maintainers = [
+    {name = "Pu Yang", email = "your.email@example.com"}
+]
+keywords = [
+    "pytorch",
+    "electromagnetic",
+    "wave-propagation", 
+    "maxwell-equations",
+    "fdtd",
+    "full-waveform-inversion",
+    "fwi",
+    "geophysics",
+    "inverse-problems",
+    "cuda"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: C",
+    "Programming Language :: C++",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+]
+dependencies = [
+    "matplotlib>=3.10.7",
+    "numpy>=2.3.5",
+    "scipy>=1.16.3",
+    "torch>=2.9.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/tide"
+Repository = "https://github.com/yourusername/tide"
+Issues = "https://github.com/yourusername/tide/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.1.0",
+]
+
+[build-system]
+requires = ["scikit-build-core>=0.10"]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+cmake.source-dir = "src/tide/csrc"
+cmake.build-type = "Release"
+wheel.packages = ["src/tide"]
+wheel.install-dir = "tide"
+build-dir = "build/{wheel_tag}"
+ninja.make-fallback = true
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]

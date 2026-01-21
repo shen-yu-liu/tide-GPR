@@ -1,6 +1,9 @@
 import ctypes
 import pathlib
 import platform
+import site
+import sys
+from importlib import resources
 from ctypes import c_bool, c_double, c_float, c_int64, c_void_p
 from typing import Any, Callable, Optional, TypeAlias
 
@@ -13,15 +16,51 @@ SO_EXT = {"Linux": "so", "Darwin": "dylib", "Windows": "dll"}.get(platform.syste
 if SO_EXT is None:
     raise RuntimeError("Unsupported OS or platform type")
 
-# Try to load the shared library
-_lib_path = pathlib.Path(__file__).resolve().parent / f"libtide_C.{SO_EXT}"
-_dll: Optional[ctypes.CDLL] = None
+def _candidate_lib_paths() -> list[pathlib.Path]:
+    lib_name = f"libtide_C.{SO_EXT}"
+    lib_dir = pathlib.Path(__file__).resolve().parent
+    candidates: list[pathlib.Path] = [
+        lib_dir / lib_name,
+        lib_dir / "tide" / lib_name,
+        lib_dir.parent / "tide.libs" / lib_name,
+    ]
 
-try:
-    _dll = ctypes.CDLL(str(_lib_path))
-except OSError:
-    # Library not compiled yet, will use Python backend
-    pass
+    try:
+        pkg_root = resources.files(__package__ or "tide")
+        candidates.append(pathlib.Path(pkg_root / lib_name))
+        candidates.append(pathlib.Path(pkg_root / "tide" / lib_name))
+        for path in pkg_root.rglob(lib_name):
+            candidates.append(pathlib.Path(path))
+    except Exception:
+        pass
+
+    try:
+        site_paths = list(site.getsitepackages())
+    except Exception:
+        site_paths = []
+    site_paths.append(site.getusersitepackages())
+    for base in site_paths:
+        if not base:
+            continue
+        base_path = pathlib.Path(base)
+        for path in base_path.glob(f"tide-*.data/**/{lib_name}"):
+            candidates.append(path)
+
+    return candidates
+
+
+_dll: Optional[ctypes.CDLL] = None
+_lib_path: pathlib.Path = pathlib.Path(__file__).resolve().parent / f"libtide_C.{SO_EXT}"
+
+for candidate in _candidate_lib_paths():
+    if not candidate.exists():
+        continue
+    try:
+        _dll = ctypes.CDLL(str(candidate))
+        _lib_path = candidate
+        break
+    except OSError:
+        continue
 
 
 def is_backend_available() -> bool:

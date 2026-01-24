@@ -3,26 +3,32 @@
 A PyTorch-based library for electromagnetic wave propagation and inversion.
 """
 
-from . import callbacks
-from . import cfl
-from . import maxwell
-from . import padding
-from . import resampling
-from . import staggered
-from . import utils
-from . import validation
-from . import wavelets
+# Handle OpenMP runtime conflicts (common on Windows with Intel libraries)
+import os
 
-from .callbacks import CallbackState, Callback, create_callback_state
+os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
+
+from . import (
+    callbacks,
+    cfl,
+    maxwell,
+    padding,
+    resampling,
+    staggered,
+    utils,
+    validation,
+    wavelets,
+)
+from .callbacks import Callback, CallbackState, create_callback_state
 from .cfl import cfl_condition
-from .padding import create_or_pad, zero_interior, reverse_pad
-from .resampling import upsample, downsample, downsample_and_movedim
+from .maxwell import MaxwellTM, maxwelltm
+from .padding import create_or_pad, reverse_pad, zero_interior
+from .resampling import downsample, downsample_and_movedim, upsample
 from .validation import (
-    validate_model_gradient_sampling_interval,
     validate_freq_taper_frac,
+    validate_model_gradient_sampling_interval,
     validate_time_pad_frac,
 )
-from .maxwell import MaxwellTM, maxwelltm
 from .wavelets import ricker
 
 __all__ = [

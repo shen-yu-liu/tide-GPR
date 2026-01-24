@@ -45,16 +45,25 @@ set(OPENMP_CONFIGURED FALSE)
 
 # On Windows with Clang, we need to manually configure OpenMP
 if(WIN32 AND CMAKE_C_COMPILER_ID MATCHES "Clang")
-    # Find libomp from LLVM installation
-    find_library(LIBOMP_LIB NAMES libomp omp PATHS "C:/Program Files/LLVM/lib" NO_DEFAULT_PATH)
-    if(LIBOMP_LIB)
-        target_link_libraries(Tide_OpenMP_Interface INTERFACE "${LIBOMP_LIB}")
+    # Try static linking first to avoid runtime DLL conflicts
+    find_library(LIBOMP_STATIC_LIB NAMES libomp_static libomp.a PATHS "C:/Program Files/LLVM/lib" NO_DEFAULT_PATH)
+    if(LIBOMP_STATIC_LIB)
+        target_link_libraries(Tide_OpenMP_Interface INTERFACE "${LIBOMP_STATIC_LIB}")
         # clang-cl uses MSVC-style flags: -openmp instead of -fopenmp
         target_compile_options(Tide_OpenMP_Interface INTERFACE -openmp)
         set(OPENMP_CONFIGURED TRUE)
-        message(STATUS "OpenMP enabled (Clang/LLVM on Windows).")
+        message(STATUS "OpenMP enabled (static linking, Clang/LLVM on Windows).")
     else()
-        message(STATUS "OpenMP not found (libomp.lib not in LLVM/lib).")
+        # Fall back to dynamic linking
+        find_library(LIBOMP_LIB NAMES libomp omp PATHS "C:/Program Files/LLVM/lib" NO_DEFAULT_PATH)
+        if(LIBOMP_LIB)
+            target_link_libraries(Tide_OpenMP_Interface INTERFACE "${LIBOMP_LIB}")
+            target_compile_options(Tide_OpenMP_Interface INTERFACE -openmp)
+            set(OPENMP_CONFIGURED TRUE)
+            message(STATUS "OpenMP enabled (dynamic linking, Clang/LLVM on Windows).")
+        else()
+            message(STATUS "OpenMP not found (libomp.lib not in LLVM/lib).")
+        endif()
     endif()
 else()
     find_package(OpenMP QUIET)

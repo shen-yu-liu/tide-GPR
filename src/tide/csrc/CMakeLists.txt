@@ -9,6 +9,22 @@ option(TIDE_ENABLE_CUDA "Enable CUDA backend" ON)
 if(TIDE_ENABLE_CUDA)
     find_package(CUDAToolkit)
     if(CUDAToolkit_FOUND)
+        # On Windows, CUDA needs MSVC cl.exe as host compiler, even if C/C++ uses Clang
+        if(WIN32 AND CMAKE_C_COMPILER_ID MATCHES "Clang")
+            # Find MSVC cl.exe for CUDA host compiler
+            find_program(MSVC_CL_EXECUTABLE cl.exe
+                PATHS "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64"
+                      "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/*/bin/Hostx64/x64"
+                      "C:/Program Files (x86)/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/*/bin/Hostx64/x64"
+                DOC "MSVC cl.exe for CUDA host compiler"
+            )
+            if(MSVC_CL_EXECUTABLE)
+                set(CMAKE_CUDA_HOST_COMPILER "${MSVC_CL_EXECUTABLE}")
+                message(STATUS "Using MSVC cl.exe for CUDA: ${CMAKE_CUDA_HOST_COMPILER}")
+            else()
+                message(WARNING "Could not find MSVC cl.exe for CUDA host compiler")
+            endif()
+        endif()
         enable_language(CUDA)
     else()
         message(WARNING "CUDA not found. Building without CUDA support.")

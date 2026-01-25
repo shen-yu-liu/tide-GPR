@@ -102,7 +102,7 @@ See the [`examples/`](examples/) directory for complete workflows:
 
 - [`example_multiscale_filtered.py`](examples/example_multiscale_filtered.py): Multi-scale FWI with frequency filtering
 - [`example_multiscale_random_sources.py`](examples/example_multiscale_random_sources.py): FWI with random source encoding
-- [`wavefield_animation.py`](examples/wavefield_animation.py): Visualize wave propagation
+- [`wavefield_animation.py`](examples/examples/wavefield_animation.py): Visualize wave propagation
 
 ## Documentation
 

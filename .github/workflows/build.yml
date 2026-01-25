@@ -52,6 +52,8 @@ jobs:
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
           CIBW_BEFORE_ALL_LINUX: >
             curl -sL https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/cuda-rhel8.repo -o /etc/yum.repos.d/cuda-rhel8.repo &&
+            dnf config-manager --set-enabled powertools &&
+            dnf install -y epel-release &&
             dnf install -y cuda-nvcc-12-4 cuda-cudart-devel-12-4 gcc-toolset-13 ccache
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
             auditwheel repair -w {dest_dir} {wheel} --plat manylinux_2_28_x86_64 --exclude libcuda.so.1 --exclude 'libcudart.so.*'
